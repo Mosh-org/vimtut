@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""
-Test split windows lesson functionality
+"""Tests for the split windows lesson.
+
+Verifies that setup creates both files and that validation checks section2.txt.
 """
 
 import os
@@ -15,17 +16,17 @@ from vimtut import Vimtut
 class TestSplitWindowsLesson(unittest.TestCase):
     """Test that split_windows lesson properly creates and validates section2.txt."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.vimtut = Vimtut()
         self.lesson = self.vimtut.get_lesson_by_id("split_windows")
         self.assertIsNotNone(self.lesson, "Lesson 'split_windows' should exist")
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up after tests."""
         self.vimtut.cleanup_lesson(self.lesson)
 
-    def test_setup_creates_both_files(self):
+    def test_setup_creates_both_files(self) -> None:
         """Test that setup creates both current_task.txt and section2.txt."""
         self.vimtut.setup_lesson(self.lesson)
 
@@ -35,14 +36,14 @@ class TestSplitWindowsLesson(unittest.TestCase):
         self.assertTrue(task1.exists(), "current_task.txt should be created")
         self.assertTrue(section2.exists(), "section2.txt should be created")
 
-    def test_validation_fails_before_edit(self):
+    def test_validation_fails_before_edit(self) -> None:
         """Test that validation fails before section2.txt is edited."""
         self.vimtut.setup_lesson(self.lesson)
 
         success, message = self.vimtut.validate_lesson(self.lesson)
         self.assertFalse(success, "Validation should fail before editing section2.txt")
 
-    def test_validation_passes_after_edit(self):
+    def test_validation_passes_after_edit(self) -> None:
         """Test that validation passes after section2.txt is correctly edited."""
         self.vimtut.setup_lesson(self.lesson)
 

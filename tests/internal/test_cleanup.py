@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Test that lesson cleanup works properly
+"""Tests for lesson cleanup.
+
+Verifies that extra files created while setting up a lesson are removed by
+``Vimtut.cleanup_lesson``.
 """
 
 import os
@@ -15,11 +17,11 @@ from vimtut import Vimtut
 class TestLessonCleanup(unittest.TestCase):
     """Test cleanup functionality for lessons with extra files."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.vimtut = Vimtut()
 
-    def test_multiple_files_cleanup(self):
+    def test_multiple_files_cleanup(self) -> None:
         """Test that task2.txt is cleaned up after multiple_files lesson."""
         lesson = self.vimtut.get_lesson_by_id("multiple_files")
         self.assertIsNotNone(lesson, "Lesson 'multiple_files' should exist")
@@ -38,7 +40,7 @@ class TestLessonCleanup(unittest.TestCase):
         # Check file is deleted
         self.assertFalse(task2_path.exists(), "task2.txt should be deleted after cleanup")
 
-    def test_split_windows_cleanup(self):
+    def test_split_windows_cleanup(self) -> None:
         """Test that section2.txt is cleaned up after split_windows lesson."""
         lesson = self.vimtut.get_lesson_by_id("split_windows")
         self.assertIsNotNone(lesson, "Lesson 'split_windows' should exist")

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Test marks lesson functionality
+"""Tests for the marks lesson.
+
+Verifies that setup creates the expected file and that validation fails before
+and passes after the task is completed.
 """
 
 import os
@@ -15,17 +17,17 @@ from vimtut import Vimtut
 class TestMarksLesson(unittest.TestCase):
     """Test that marks lesson properly creates a long file and validates mark usage."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.vimtut = Vimtut()
         self.lesson = self.vimtut.get_lesson_by_id("marks")
         self.assertIsNotNone(self.lesson, "Lesson 'marks' should exist")
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up after tests."""
         self.vimtut.cleanup_lesson(self.lesson)
 
-    def test_setup_creates_file_with_markers(self):
+    def test_setup_creates_file_with_markers(self) -> None:
         """Test that setup creates a file with DELETE_THIS markers."""
         self.vimtut.setup_lesson(self.lesson)
 
@@ -38,14 +40,14 @@ class TestMarksLesson(unittest.TestCase):
         delete_count = content.count('DELETE_THIS')
         self.assertEqual(delete_count, 3, f"Should have 3 DELETE_THIS markers, found {delete_count}")
 
-    def test_validation_fails_before_edit(self):
+    def test_validation_fails_before_edit(self) -> None:
         """Test that validation fails before DELETE_THIS words are removed."""
         self.vimtut.setup_lesson(self.lesson)
 
         success, message = self.vimtut.validate_lesson(self.lesson)
         self.assertFalse(success, "Validation should fail before removing DELETE_THIS")
 
-    def test_validation_passes_after_edit(self):
+    def test_validation_passes_after_edit(self) -> None:
         """Test that validation passes after DELETE_THIS words are removed."""
         self.vimtut.setup_lesson(self.lesson)
 
