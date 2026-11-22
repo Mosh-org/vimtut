@@ -6,11 +6,11 @@ from __future__ import annotations
 import os
 import sys
 import unittest
-from typing import Any, cast
+from typing import cast
 
 # Import the Vimtut class from parent directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from vimtut import Vimtut
+from vimtut import Lesson, Vimtut
 
 
 class TestLessonCleanup(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestLessonCleanup(unittest.TestCase):
 
     def test_multiple_files_cleanup(self) -> None:
         """Test that task2.txt is cleaned up after multiple_files lesson."""
-        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("multiple_files"))
+        lesson = cast(Lesson, self.vimtut.get_lesson_by_id("multiple_files"))
         self.assertIsNotNone(lesson, "Lesson 'multiple_files' should exist")
 
         # Setup the lesson
@@ -43,7 +43,7 @@ class TestLessonCleanup(unittest.TestCase):
 
     def test_split_windows_cleanup(self) -> None:
         """Test that section2.txt is cleaned up after split_windows lesson."""
-        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("split_windows"))
+        lesson = cast(Lesson, self.vimtut.get_lesson_by_id("split_windows"))
         self.assertIsNotNone(lesson, "Lesson 'split_windows' should exist")
 
         # Setup the lesson

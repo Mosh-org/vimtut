@@ -6,23 +6,23 @@ from __future__ import annotations
 import os
 import sys
 import unittest
-from typing import Any, cast
+from typing import cast
 
 # Import the Vimtut class from parent directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from vimtut import Vimtut
+from vimtut import Lesson, Vimtut
 
 
 class TestMultipleFilesLesson(unittest.TestCase):
     """Test that multiple_files lesson properly creates and validates second file."""
 
     vimtut: Vimtut
-    lesson: dict[str, Any]
+    lesson: Lesson
 
     def setUp(self) -> None:
         """Set up test environment."""
         self.vimtut = Vimtut()
-        self.lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("multiple_files"))
+        self.lesson = cast(Lesson, self.vimtut.get_lesson_by_id("multiple_files"))
         self.assertIsNotNone(self.lesson, "Lesson 'multiple_files' should exist")
 
     def tearDown(self) -> None:

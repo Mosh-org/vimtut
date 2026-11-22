@@ -6,23 +6,23 @@ from __future__ import annotations
 import os
 import sys
 import unittest
-from typing import Any, cast
+from typing import cast
 
 # Import the Vimtut class from parent directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-from vimtut import Vimtut
+from vimtut import Lesson, Vimtut
 
 
 class TestSplitWindowsLesson(unittest.TestCase):
     """Test that split_windows lesson properly creates and validates section2.txt."""
 
     vimtut: Vimtut
-    lesson: dict[str, Any]
+    lesson: Lesson
 
     def setUp(self) -> None:
         """Set up test environment."""
         self.vimtut = Vimtut()
-        self.lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("split_windows"))
+        self.lesson = cast(Lesson, self.vimtut.get_lesson_by_id("split_windows"))
         self.assertIsNotNone(self.lesson, "Lesson 'split_windows' should exist")
 
     def tearDown(self) -> None:
