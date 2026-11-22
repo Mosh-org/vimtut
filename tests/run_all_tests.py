@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Main test runner for Vimtut tests.
+"""Main test runner for Vimtut tests.
 
 Runs all unit tests from the internal test modules.
 
@@ -8,6 +7,8 @@ Usage:
     python tests/run_all_tests.py
     python -m tests.run_all_tests
 """
+
+from __future__ import annotations
 
 import os
 import sys
@@ -25,8 +26,12 @@ from tests.internal import test_split_windows
 from tests.internal import test_marks
 
 
-def create_test_suite():
-    """Create a test suite containing all tests."""
+def create_test_suite() -> unittest.TestSuite:
+    """Create a test suite containing all tests.
+
+    Returns:
+        A suite with the tests from every internal test module.
+    """
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
 
@@ -41,8 +46,15 @@ def create_test_suite():
     return suite
 
 
-def run_tests(verbosity=2):
-    """Run all tests and return success status."""
+def run_tests(verbosity: int = 2) -> bool:
+    """Run all tests and return success status.
+
+    Args:
+        verbosity: The unittest runner verbosity level.
+
+    Returns:
+        True if every test passed, False otherwise.
+    """
     suite = create_test_suite()
     runner = unittest.TextTestRunner(verbosity=verbosity)
     result = runner.run(suite)
@@ -55,7 +67,7 @@ if __name__ == '__main__':
     print("=" * 70)
     print()
 
-    success = run_tests()
+    success: bool = run_tests()
 
     print()
     print("=" * 70)

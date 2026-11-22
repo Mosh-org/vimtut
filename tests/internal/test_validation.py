@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""
-Unit tests for Vimtut validation logic
-"""
+"""Unit tests for Vimtut validation logic."""
+
+from __future__ import annotations
 
 import os
 import sys
@@ -9,6 +9,7 @@ import json
 import time
 import tempfile
 import unittest
+from typing import Any, cast
 from pathlib import Path
 
 # Import the Vimtut class from parent directory
@@ -19,7 +20,10 @@ from vimtut import Vimtut
 class TestVimtutValidation(unittest.TestCase):
     """Test validation logic for different lesson types."""
 
-    def setUp(self):
+    test_dir: str
+    vimtut: Vimtut
+
+    def setUp(self) -> None:
         """Set up test environment with temporary workspace."""
         self.test_dir = tempfile.mkdtemp()
         self.vimtut = Vimtut()
@@ -27,12 +31,12 @@ class TestVimtutValidation(unittest.TestCase):
         self.vimtut.workspace_dir = Path(self.test_dir)
         self.vimtut.current_lesson_file = self.vimtut.workspace_dir / "current_task.txt"
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up temporary files."""
         import shutil
         shutil.rmtree(self.test_dir)
 
-    def test_file_saved_validation_success(self):
+    def test_file_saved_validation_success(self) -> None:
         """Test that file_saved validation passes when file is actually saved."""
         lesson = {
             "id": "test_exit",
@@ -44,7 +48,7 @@ class TestVimtutValidation(unittest.TestCase):
         # Setup the lesson (creates file and records mtime)
         self.vimtut.setup_lesson(lesson)
 
-        # Simulate Vim saving the file by sleeping and touching it
+        # Simulate Vim saving the file by sleeping and rewriting it
         time.sleep(0.01)  # Ensure time has passed
         with open(self.vimtut.current_lesson_file, 'w') as f:
             f.write("")  # Write (simulating :wq)
@@ -54,7 +58,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertTrue(success, f"Validation should pass: {message}")
         self.assertIn("Success", message)
 
-    def test_file_saved_validation_failure_not_modified(self):
+    def test_file_saved_validation_failure_not_modified(self) -> None:
         """Test that file_saved validation fails when file is not modified."""
         lesson = {
             "id": "test_exit",
@@ -74,7 +78,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertFalse(success, "Validation should fail when file not saved")
         self.assertIn("wasn't saved", message)
 
-    def test_file_saved_validation_failure_file_deleted(self):
+    def test_file_saved_validation_failure_file_deleted(self) -> None:
         """Test that file_saved validation fails when file is deleted (:q!)."""
         lesson = {
             "id": "test_exit",
@@ -94,7 +98,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertFalse(success, "Validation should fail when file deleted")
         self.assertIn("doesn't exist", message)
 
-    def test_exact_match_validation_success(self):
+    def test_exact_match_validation_success(self) -> None:
         """Test exact_match validation with correct content."""
         lesson = {
             "id": "test_nav",
@@ -115,7 +119,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertTrue(success, f"Validation should pass: {message}")
         self.assertIn("Perfect", message)
 
-    def test_exact_match_validation_failure(self):
+    def test_exact_match_validation_failure(self) -> None:
         """Test exact_match validation with incorrect content."""
         lesson = {
             "id": "test_nav",
@@ -137,7 +141,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertIn("Not quite right", message)
         self.assertIn("DIFFERENT", message)  # New improved message format
 
-    def test_contains_validation_success(self):
+    def test_contains_validation_success(self) -> None:
         """Test contains validation when substring is present."""
         lesson = {
             "id": "test_contains",
@@ -158,7 +162,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertTrue(success, f"Validation should pass: {message}")
         self.assertIn("Great work", message)
 
-    def test_contains_validation_failure(self):
+    def test_contains_validation_failure(self) -> None:
         """Test contains validation when substring is missing."""
         lesson = {
             "id": "test_contains",
@@ -179,7 +183,7 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertFalse(success, "Validation should fail when substring missing")
         self.assertIn("should contain", message)
 
-    def test_load_lessons(self):
+    def test_load_lessons(self) -> None:
         """Test that lessons are loaded correctly from JSON files."""
         # This uses the real lessons directory
         vimtut = Vimtut()
@@ -192,10 +196,10 @@ class TestVimtutValidation(unittest.TestCase):
         self.assertIn('validation_type', first_lesson)
         self.assertIn('instruction_text', first_lesson)
 
-    def test_lesson_the_exit_structure(self):
+    def test_lesson_the_exit_structure(self) -> None:
         """Test that the first lesson (The Exit) has correct structure."""
         vimtut = Vimtut()
-        lesson = vimtut.get_lesson_by_id("the_exit")
+        lesson = cast("dict[str, Any]", vimtut.get_lesson_by_id("the_exit"))
 
         self.assertIsNotNone(lesson, "Lesson 'the_exit' should exist")
         self.assertEqual(lesson['validation_type'], 'file_saved')

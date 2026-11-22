@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""
-Test that lesson cleanup works properly
-"""
+"""Test that lesson cleanup works properly."""
+
+from __future__ import annotations
 
 import os
 import sys
 import unittest
+from typing import Any, cast
 
 # Import the Vimtut class from parent directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -15,13 +16,15 @@ from vimtut import Vimtut
 class TestLessonCleanup(unittest.TestCase):
     """Test cleanup functionality for lessons with extra files."""
 
-    def setUp(self):
+    vimtut: Vimtut
+
+    def setUp(self) -> None:
         """Set up test environment."""
         self.vimtut = Vimtut()
 
-    def test_multiple_files_cleanup(self):
+    def test_multiple_files_cleanup(self) -> None:
         """Test that task2.txt is cleaned up after multiple_files lesson."""
-        lesson = self.vimtut.get_lesson_by_id("multiple_files")
+        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("multiple_files"))
         self.assertIsNotNone(lesson, "Lesson 'multiple_files' should exist")
 
         # Setup the lesson
@@ -38,9 +41,9 @@ class TestLessonCleanup(unittest.TestCase):
         # Check file is deleted
         self.assertFalse(task2_path.exists(), "task2.txt should be deleted after cleanup")
 
-    def test_split_windows_cleanup(self):
+    def test_split_windows_cleanup(self) -> None:
         """Test that section2.txt is cleaned up after split_windows lesson."""
-        lesson = self.vimtut.get_lesson_by_id("split_windows")
+        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("split_windows"))
         self.assertIsNotNone(lesson, "Lesson 'split_windows' should exist")
 
         # Setup the lesson

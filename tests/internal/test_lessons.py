@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""
-Test individual lessons to verify their validation logic
-"""
+"""Test individual lessons to verify their validation logic."""
+
+from __future__ import annotations
 
 import os
 import sys
@@ -9,6 +9,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Any, cast
 
 # Import the Vimtut class from parent directory
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -18,13 +19,15 @@ from vimtut import Vimtut
 class TestLessonContent(unittest.TestCase):
     """Test specific lessons have correct expected content."""
 
-    def setUp(self):
+    vimtut: Vimtut
+
+    def setUp(self) -> None:
         """Load all lessons."""
         self.vimtut = Vimtut()
 
-    def test_lesson_02_navigation_delete_m(self):
+    def test_lesson_02_navigation_delete_m(self) -> None:
         """Test lesson 2 - deleting 'M' produces correct output."""
-        lesson = self.vimtut.get_lesson_by_id("navigation_hjkl")
+        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("navigation_hjkl"))
         self.assertIsNotNone(lesson)
 
         # Simulate the task: delete 'M' from the setup file
@@ -41,9 +44,9 @@ class TestLessonContent(unittest.TestCase):
         result = original.replace("K L M N O", "K L  N O")
         self.assertEqual(result, expected, "Deleting M should produce expected target")
 
-    def test_lesson_03_insert_brown(self):
+    def test_lesson_03_insert_brown(self) -> None:
         """Test lesson 3 - inserting 'brown' is correct."""
-        lesson = self.vimtut.get_lesson_by_id("insert_mode")
+        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("insert_mode"))
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -52,9 +55,9 @@ class TestLessonContent(unittest.TestCase):
         self.assertEqual(original, "The quick fox jumps over the lazy dog.")
         self.assertEqual(expected, "The quick brown fox jumps over the lazy dog.")
 
-    def test_lesson_06_delete_extra_letters(self):
+    def test_lesson_06_delete_extra_letters(self) -> None:
         """Test lesson 6 - deleting extra letters."""
-        lesson = self.vimtut.get_lesson_by_id("delete_char")
+        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("delete_char"))
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -63,9 +66,9 @@ class TestLessonContent(unittest.TestCase):
         self.assertEqual(original, "Helllllo Worrrlld")
         self.assertEqual(expected, "Hello World")
 
-    def test_lesson_07_delete_lines(self):
+    def test_lesson_07_delete_lines(self) -> None:
         """Test lesson 7 - deleting specific lines."""
-        lesson = self.vimtut.get_lesson_by_id("delete_line")
+        lesson = cast("dict[str, Any]", self.vimtut.get_lesson_by_id("delete_line"))
         self.assertIsNotNone(lesson)
 
         original = lesson['setup_file']
@@ -84,7 +87,7 @@ class TestLessonContent(unittest.TestCase):
         self.assertNotIn("DELETE ME", expected)
         self.assertNotIn("REMOVE THIS", expected)
 
-    def test_all_lessons_have_required_fields(self):
+    def test_all_lessons_have_required_fields(self) -> None:
         """Ensure all lessons have required fields."""
         required_fields = ['id', 'title', 'instruction_text', 'setup_file',
                           'validation_type', 'target_content', 'next_lesson']
@@ -94,7 +97,7 @@ class TestLessonContent(unittest.TestCase):
                 self.assertIn(field, lesson,
                              f"Lesson {lesson.get('id', 'unknown')} missing field: {field}")
 
-    def test_validation_types_are_valid(self):
+    def test_validation_types_are_valid(self) -> None:
         """Ensure all lessons use valid validation types."""
         valid_types = ['file_saved', 'exact_match', 'contains', 'exact_match_file']
 
@@ -107,21 +110,35 @@ class TestLessonContent(unittest.TestCase):
 class TestLessonLinkedList(unittest.TestCase):
     """Test the linked list structure of lessons."""
 
-    def setUp(self):
+    vimtut: Vimtut
+
+    def setUp(self) -> None:
         """Load all lessons."""
         self.vimtut = Vimtut()
 
-    def _load_all_lessons_raw(self, directory):
-        """Load all lesson files from a directory into a dict by ID."""
-        lessons_by_id = {}
+    def _load_all_lessons_raw(self, directory: Path) -> dict[str, dict[str, Any]]:
+        """Load all lesson files from a directory into a dict by ID.
+
+        Args:
+            directory: Directory containing lesson JSON files.
+
+        Returns:
+            A mapping of lesson ID to the parsed lesson data.
+        """
+        lessons_by_id: dict[str, dict[str, Any]] = {}
         for lesson_file in directory.glob("*.json"):
             with open(lesson_file, 'r') as f:
                 lesson = json.load(f)
                 lessons_by_id[lesson['id']] = lesson
         return lessons_by_id
 
-    def _validate_chain(self, lessons_by_id, chain_name):
-        """Validate a lesson chain has no cycles and includes all lessons."""
+    def _validate_chain(self, lessons_by_id: dict[str, dict[str, Any]], chain_name: str) -> None:
+        """Validate that a lesson chain has no cycles and includes all lessons.
+
+        Args:
+            lessons_by_id: A mapping of lesson ID to lesson data.
+            chain_name: A label used in assertion messages.
+        """
         if not lessons_by_id:
             return  # Empty chain is valid
 
@@ -141,9 +158,9 @@ class TestLessonLinkedList(unittest.TestCase):
         first_id = first_ids.pop()
 
         # Walk the chain and check for cycles
-        visited = set()
-        current_id = first_id
-        chain_order = []
+        visited: set[str] = set()
+        current_id: str | None = first_id
+        chain_order: list[str] = []
 
         while current_id:
             self.assertNotIn(current_id, visited,
@@ -175,19 +192,19 @@ class TestLessonLinkedList(unittest.TestCase):
         self.assertEqual(len(chain_order), len(lessons_by_id),
             f"{chain_name}: Chain has {len(chain_order)} lessons but directory has {len(lessons_by_id)}")
 
-    def test_basic_lessons_chain_valid(self):
+    def test_basic_lessons_chain_valid(self) -> None:
         """Test that basic lessons form a valid linked list."""
         lessons_by_id = self._load_all_lessons_raw(self.vimtut.lessons_dir)
         self._validate_chain(lessons_by_id, "Basic lessons")
 
-    def test_advanced_lessons_chain_valid(self):
+    def test_advanced_lessons_chain_valid(self) -> None:
         """Test that advanced lessons form a valid linked list."""
         if not self.vimtut.advanced_dir.exists():
             self.skipTest("No advanced lessons directory")
         lessons_by_id = self._load_all_lessons_raw(self.vimtut.advanced_dir)
         self._validate_chain(lessons_by_id, "Advanced lessons")
 
-    def test_no_cross_chain_references(self):
+    def test_no_cross_chain_references(self) -> None:
         """Test that basic and advanced chains don't reference each other."""
         basic_ids = {lesson['id'] for lesson in self.vimtut.basic_lessons}
         advanced_ids = {lesson['id'] for lesson in self.vimtut.advanced_lessons}
@@ -206,7 +223,7 @@ class TestLessonLinkedList(unittest.TestCase):
                 self.assertNotIn(next_id, basic_ids,
                     f"Advanced lesson '{lesson['id']}' points to basic lesson '{next_id}'")
 
-    def test_chains_end_with_null(self):
+    def test_chains_end_with_null(self) -> None:
         """Test that each chain ends with a lesson where next_lesson is null."""
         # Check basic chain
         if self.vimtut.basic_lessons:
@@ -222,7 +239,7 @@ class TestLessonLinkedList(unittest.TestCase):
                 f"Last advanced lesson '{last_advanced['id']}' should have next_lesson=null, "
                 f"but has '{last_advanced.get('next_lesson')}'")
 
-    def test_all_next_lesson_references_exist(self):
+    def test_all_next_lesson_references_exist(self) -> None:
         """Test that every next_lesson reference points to an existing lesson."""
         all_ids = {lesson['id'] for lesson in self.vimtut.lessons}
 
