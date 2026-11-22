@@ -17,6 +17,7 @@ from typing import Dict, List, Optional
 
 class Vimtut:
     def __init__(self):
+        """Initialize lesson directories and tutorial state."""
         self.base_dir = Path(__file__).parent
         self.lessons_dir = self.base_dir / "lessons"
         self.advanced_dir = self.lessons_dir / "advanced"
@@ -803,6 +804,7 @@ class Vimtut:
 
 
 def main():
+    """Parse command-line arguments and run the tutorial."""
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description='Vimtut - Interactive Vim Tutorial',
